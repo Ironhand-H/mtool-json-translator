@@ -6,8 +6,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LMStudioClient {
 
+    // Not recommended for use, as it has not enough parameters to do better translation
     public ResponseResultDTO response(String input, String model, String uri) {
         RestClient restClient = RestClient.create();
         ResponseRequestDTO obj = new ResponseRequestDTO(model, input);
@@ -18,6 +22,24 @@ public class LMStudioClient {
                 .body(obj)
                 .retrieve()
                 .toEntity(ResponseResultDTO.class);
+
+        return result.getBody();
+    }
+
+    public CompletionResultDTO completion(String input, String model, String uri, String developerMessage, String systemMessage, Integer temperature) {
+        RestClient restClient = RestClient.create();
+        List<MessagesDTO> messages = new ArrayList<>();
+
+        messages.add(new MessagesDTO("developer", developerMessage));
+        messages.add(new MessagesDTO("system", systemMessage));
+        CompletionRequestDTO obj = new CompletionRequestDTO(model, temperature, messages);
+
+        ResponseEntity<CompletionResultDTO> result = restClient.post()
+                .uri(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(obj)
+                .retrieve()
+                .toEntity(CompletionResultDTO.class);
 
         return result.getBody();
     }
