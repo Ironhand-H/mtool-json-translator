@@ -1,18 +1,21 @@
 package com.ironhand.mtool_json_translator;
 
-import com.ironhand.mtool_json_translator.service.Translate;
-import org.springframework.boot.SpringApplication;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import com.ironhand.mtool_json_translator.client.LMStudioClient;
+import com.ironhand.mtool_json_translator.service.*;
 
 @SpringBootApplication
 public class MtoolJsonTranslatorApplication {
 
 	public static void main(String[] args) {
-		System.out.println(Translate.response("你好", "deepseek-r1-distill-qwen-14b", "http://127.0.0.1:1234/v1/responses"));
+        TranslatePipeline pipeline = new TranslatePipeline();
+        try {
+            pipeline.MToolTranslate("qwen/qwen3-14b", "http://127.0.0.1:1234/v1/responses", "D:\\ManualTransFile.json", 7500);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-		//SpringApplication.run(MtoolJsonTranslatorApplication.class, args);
+        //SpringApplication.run(MtoolJsonTranslatorApplication.class, args);
 	}
 
 }

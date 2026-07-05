@@ -1,10 +1,22 @@
 package com.ironhand.mtool_json_translator.service;
 
-import com.fasterxml.jackson.core.json.JsonWriteContext;
-import org.apache.tomcat.util.json.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JSONFilePraser {
-    public static JsonWriteContext MToolFilePraser(){
+import java.io.File;
 
+public class JSONFileParser {
+    public static JsonNode MToolFileParser(String path) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File(path); //"D:/ManualTransFile.json"
+
+        try {
+            return objectMapper.readTree(file);
+        }
+        catch(Exception e) {
+            System.out.println("File error: " + path + e.getMessage());
+        }
+
+        return null;
     }
 }

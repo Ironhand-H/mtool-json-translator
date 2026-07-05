@@ -3,7 +3,7 @@ package com.ironhand.mtool_json_translator.service;
 import com.ironhand.mtool_json_translator.DTO.ResponseResultDTO;
 import com.ironhand.mtool_json_translator.client.LMStudioClient;
 
-public class Translate {
+public class TranslateService {
     public static String response(String input, String model, String uri){
         LMStudioClient client =  new LMStudioClient();
 
