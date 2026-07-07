@@ -9,10 +9,10 @@ import java.util.List;
 @Setter
 public class CompletionRequestDTO {
     private String model;
-    private Integer temperature;
-    private List<MessagesDTO> messages;
+    private Double temperature;
+    private List<MessageDTO> messages;
 
-    public CompletionRequestDTO(String model, Integer temperature, List<MessagesDTO> messages){
+    public CompletionRequestDTO(String model, Double temperature, List<MessageDTO> messages){
         this.model = model;
         this.temperature = temperature;
         this.messages = messages;

@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.ironhand.mtool_json_translator.service.FileFactory.generateTranslatedMTool;
 import static com.ironhand.mtool_json_translator.service.TextFactory.*;
 import static com.ironhand.mtool_json_translator.service.PromptProvider.*;
 import static com.ironhand.mtool_json_translator.service.TranslateBatch.separateText;
@@ -16,34 +19,44 @@ public class TranslatePipeline {
         //System.out.println(TranslateService.response("你好", "deepseek-r1-distill-qwen-14b", "http://127.0.0.1:1234/v1/responses", 8192));
         //"D:\\ManualTransFile.json"
 
-        StringBuilder prompt = null;
-        StringBuilder result = null;
-        ObjectMapper objectMapper = new ObjectMapper();
+        StringBuilder translatedBatchText = null;
 
-        Map<String, String> allText = MToolJSONExtractor(JSONFileParser.MToolFileParser(filePath));
+        LinkedHashMap<String, String> originText = MToolJSONExtractor(JSONFileParser.MToolFileParser(filePath));
+        LinkedHashMap<String, String> translatedText = new LinkedHashMap<>();
 
-        if (allText != null) {
-            List<Map<String, String>> separatedText = separateText(allText, batchLimit, getDefaultPrompt().length());
-            for (Map<String, String> batchText : separatedText){
-                prompt = new StringBuilder(getDefaultPrompt());
-                prompt.append(mapToPrompt(batchText));
-                result = new StringBuilder(TranslateService.response(prompt.toString(), model, uri));
+        if (originText != null) {
+            List<LinkedHashMap<String, String>> separatedText = separateText(originText, batchLimit, getDefaultPrompt().length());
+
+            for (LinkedHashMap<String, String> batchText : separatedText) {
+                try{
+                    translatedBatchText = new StringBuilder(TranslateService.completion(model, uri, getDefaultPrompt(), mapToPrompt(batchText), 0.2));
+                    translatedText.putAll(extractResult(translatedBatchText.toString(), batchText));
+                } catch (Exception e) {
+                    try{
+                        translatedBatchText = new StringBuilder(TranslateService.completion(model, uri, getDefaultPromptSafe(), mapToPromptSafe(batchText), 0.2));
+                        translatedText.putAll(extractResultSafe(translatedBatchText.toString(), batchText));
+                    } catch (Exception ex) {
+                        try{
+                            translatedText.putAll(extractResultStrict(TranslateService.completionStrict(
+                                            model, uri,
+                                            getDefaultPromptStrict(),
+                                            mapToPromptStrict(batchText),
+                                            0.2), batchText));
+                        }catch (Exception exc){
+                            throw new RuntimeException(exc);
+                        }
+                    }
+                }
+
+                break;
             }
-
-            JsonNode translatedJSON = objectMapper.readTree(result.toString());
-
-            result = new StringBuilder(translatedJSON.toPrettyString());
-
         }
 
-//        Map<String, String> allText = null;
-//        try {
-//            allText = MToolJSONExtractor(jsonNode);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//        if (allText != null) {
-//            System.out.println(allText.values());
-//        }
+
+        try {
+            generateTranslatedMTool(translatedText, filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

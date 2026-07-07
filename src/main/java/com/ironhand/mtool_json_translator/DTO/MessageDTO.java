@@ -5,16 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MessagesDTO {
+public class MessageDTO {
     private String role;
     private String content;
-    private String refusal;
 
-
-
-    public MessagesDTO(String role, String content, String refusal){
+    public MessageDTO(String role, String content){
         this.role = role;
         this.content = content;
-        this.refusal = refusal;
     }
 }

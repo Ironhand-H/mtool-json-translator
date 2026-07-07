@@ -1,18 +1,15 @@
 package com.ironhand.mtool_json_translator.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TranslateBatch {
-    public static List<Map<String, String>> separateText(Map<String, String> allText, Integer batchLimit, Integer promptSize){
-        List<Map<String, String>> separatedText = new ArrayList<>();
+    public static List<LinkedHashMap<String, String>> separateText(LinkedHashMap<String, String> allText, Integer batchLimit, Integer promptSize){
+        List<LinkedHashMap<String, String>> separatedText = new ArrayList<>();
         int count = promptSize;
 
         for (Map.Entry<String, String> pair : allText.entrySet()) {
             if (separatedText.isEmpty() || count >= batchLimit){
-                separatedText.add(new HashMap<String, String>());
+                separatedText.add(new LinkedHashMap<String, String>());
                 count = promptSize;
             }
 
@@ -23,8 +20,8 @@ public class TranslateBatch {
         return separatedText;
     }
 
-    public static Map<String, String> assembleText(List<Map<String, String>> separatedText){
-        Map<String, String> assembledText = new HashMap<>();
+    public static LinkedHashMap<String, String> assembleText(List<LinkedHashMap<String, String>> separatedText){
+        LinkedHashMap<String, String> assembledText = new LinkedHashMap<>();
 
         separatedText.forEach(assembledText::putAll);
 

@@ -26,12 +26,12 @@ public class LMStudioClient {
         return result.getBody();
     }
 
-    public CompletionResultDTO completion(String input, String model, String uri, String developerMessage, String systemMessage, Integer temperature) {
+    public CompletionResultDTO completion(String model, String uri, String developerMessage, String systemMessage, Double temperature) {
         RestClient restClient = RestClient.create();
-        List<MessagesDTO> messages = new ArrayList<>();
+        List<MessageDTO> messages = new ArrayList<>();
 
-        messages.add(new MessagesDTO("developer", developerMessage));
-        messages.add(new MessagesDTO("system", systemMessage));
+        messages.add(new MessageDTO("developer", developerMessage));
+        messages.add(new MessageDTO("user", systemMessage));
         CompletionRequestDTO obj = new CompletionRequestDTO(model, temperature, messages);
 
         ResponseEntity<CompletionResultDTO> result = restClient.post()

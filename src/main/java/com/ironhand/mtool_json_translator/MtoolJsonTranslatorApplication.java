@@ -10,7 +10,7 @@ public class MtoolJsonTranslatorApplication {
 	public static void main(String[] args) {
         TranslatePipeline pipeline = new TranslatePipeline();
         try {
-            pipeline.MToolTranslate("qwen/qwen3-14b", "http://127.0.0.1:1234/v1/responses", "D:\\ManualTransFile.json", 7500);
+            pipeline.MToolTranslate("qwen/qwen3-14b", "http://127.0.0.1:1234/v1/chat/completions", "D:\\ManualTransFile.json", 2500);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

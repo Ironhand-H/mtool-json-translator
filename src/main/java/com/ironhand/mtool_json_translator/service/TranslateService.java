@@ -1,7 +1,11 @@
 package com.ironhand.mtool_json_translator.service;
 
+import com.ironhand.mtool_json_translator.DTO.CompletionResultDTO;
 import com.ironhand.mtool_json_translator.DTO.ResponseResultDTO;
 import com.ironhand.mtool_json_translator.client.LMStudioClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TranslateService {
     public static String response(String input, String model, String uri){
@@ -16,5 +20,25 @@ public class TranslateService {
             return result.getOutput().getLast().getContent().getFirst().getText();
         } else
             return "";
+    }
+
+    public static String completion(String model, String uri, String developerMessage, String systemMessage, Double temperature){
+        LMStudioClient client =  new LMStudioClient();
+
+        CompletionResultDTO result = client.completion(model, uri, developerMessage, systemMessage, temperature);
+
+        return result.getChoices().getFirst().getMessage().getContent();
+    }
+
+    public static List<String> completionStrict(String model, String uri, String developerMessage, List<String> systemMessage, Double temperature){
+        LMStudioClient client =  new LMStudioClient();
+        List<String> result = new ArrayList<>();
+
+        for (String s: systemMessage){
+            CompletionResultDTO response = client.completion(model, uri, developerMessage, s, temperature);
+            result.add(response.getChoices().getFirst().getMessage().getContent().strip());
+        }
+
+        return result;
     }
 }

@@ -12,12 +12,12 @@ public class ChoiceDTO {
 
     private String finish_reason;
 
-    private String model;
+    private MessageDTO message;
 
-    public ChoiceDTO(String index, String logprobs, String finish_reason, String model){
+    public ChoiceDTO(String index, String logprobs, String finish_reason, MessageDTO message){
         this.index = index;
         this.logprobs = logprobs;
         this.finish_reason = finish_reason;
-        this.model = model;
+        this.message = message;
     }
 }
