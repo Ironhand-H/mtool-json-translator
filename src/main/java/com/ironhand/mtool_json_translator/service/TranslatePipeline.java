@@ -23,11 +23,14 @@ public class TranslatePipeline {
 
         LinkedHashMap<String, String> originText = MToolJSONExtractor(JSONFileParser.MToolFileParser(filePath));
         LinkedHashMap<String, String> translatedText = new LinkedHashMap<>();
+        int i = 1;
 
         if (originText != null) {
             List<LinkedHashMap<String, String>> separatedText = separateText(originText, batchLimit, getDefaultPrompt().length());
 
             for (LinkedHashMap<String, String> batchText : separatedText) {
+                System.out.println("Batch:" + i + "/" + separatedText.size());
+
                 try{
                     translatedBatchText = new StringBuilder(TranslateService.completion(model, uri, getDefaultPrompt(), mapToPrompt(batchText), 0.2));
                     translatedText.putAll(extractResult(translatedBatchText.toString(), batchText));
@@ -48,7 +51,7 @@ public class TranslatePipeline {
                     }
                 }
 
-                break;
+                i++;
             }
         }
 
