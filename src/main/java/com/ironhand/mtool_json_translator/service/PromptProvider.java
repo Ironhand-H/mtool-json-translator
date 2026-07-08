@@ -136,4 +136,31 @@ public class PromptProvider {
         /no_think
         """;
     }
+
+    public static String getSimplePromptStrict(){
+        return """
+        
+        Translate the following text into Simplified Chinese.
+        
+        Rules:
+        
+        - Translate only the given text.
+        - Preserve the original meaning and tone.
+        - Preserve line breaks.
+        - Preserve placeholders.
+        - Preserve variables.
+        - Preserve filenames.
+        - Preserve resource paths.
+        - Preserve escape sequences such as \\n and \\t.
+        - Preserve symbols 「 and 」
+        - Do not explain.
+        - Do not add notes.
+        - Do not add quotation marks.
+        - Do not add markdown.
+        - If the text should not be translated, return it unchanged.
+       
+        
+        /no_think
+        """;
+    }
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import java.time.LocalTime;
 import java.util.*;
 
 public class TextFactory {
@@ -24,6 +25,7 @@ public class TextFactory {
     public static String mapToPrompt(LinkedHashMap<String, String> map) throws JsonProcessingException {
         nullCheck(map);
 
+        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("从Map到提示词转换（Fast）..."));
         List<String> result = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -31,12 +33,14 @@ public class TextFactory {
             result.add(entry.getValue());
         }
 
+        System.out.print("转换成功\n");
         return objectMapper.writeValueAsString(result);
     }
 
     public static String mapToPromptSafe(LinkedHashMap<String, String> map) throws JsonProcessingException {
         nullCheck(map);
 
+        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("从Map到提示词转换（Safe）..."));
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();
         Integer index = 0;
@@ -48,18 +52,21 @@ public class TextFactory {
             index++;
         }
 
+        System.out.print("转换成功\n");
         return objectMapper.writeValueAsString(arrayNode);
     }
 
     public static List<String> mapToPromptStrict(LinkedHashMap<String, String> map) {
         nullCheck(map);
 
+        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("从Map到提示词转换（Strict）..."));
         List<String> strings = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : map.entrySet()) {
             strings.add(entry.getValue());
         }
 
+        System.out.print("转换成功\n");
         return strings;
     }
 
@@ -69,8 +76,11 @@ public class TextFactory {
         ObjectMapper objectMapper = new ObjectMapper();
         int i  = 0;
 
+        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("提取结果..."));
         List<String> translated = objectMapper.readValue(resultBody, new TypeReference<List<String>>(){});
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
+
+        System.out.print("转换成功，从List到Map\n");
 
         if (translated.size() != map.size())
             throw new RuntimeException("Input value size not equals result value size");
@@ -80,6 +90,7 @@ public class TextFactory {
             i++;
         }
 
+        System.out.print("Complete\n");
         return result;
     }
 
@@ -87,6 +98,7 @@ public class TextFactory {
         ObjectMapper objectMapper = new ObjectMapper();
         int i  = 0;
 
+        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("提取结果（Safe）..."));
         JsonNode translated = objectMapper.readTree(resultBody);
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
 
@@ -98,6 +110,7 @@ public class TextFactory {
             i++;
         }
 
+        System.out.print("Complete\n");
         return result;
     }
 
@@ -105,10 +118,13 @@ public class TextFactory {
         ObjectMapper objectMapper = new ObjectMapper();
         int i  = 0;
 
+        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("提取结果（Strict）..."));
         List<JsonNode> translated = new ArrayList<>();
         for (String s: resultBody){
             translated.add(objectMapper.createObjectNode().put("text", s));
         }
+
+        System.out.print("转换成功，从ListJsonNode到Map...");
 
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
 
@@ -120,6 +136,7 @@ public class TextFactory {
             i++;
         }
 
+        System.out.print("Complete\n");
         return result;
     }
 

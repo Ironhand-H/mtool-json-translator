@@ -4,12 +4,18 @@ package com.ironhand.mtool_json_translator.client;
 import com.ironhand.mtool_json_translator.DTO.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LMStudioClient {
+    private RestClient restClient;
+
+    public LMStudioClient(RestClient restClient){
+        this.restClient = restClient;
+    }
 
     // Not recommended for use, as it has not enough parameters to do better translation
     public ResponseResultDTO response(String input, String model, String uri) {
@@ -27,7 +33,6 @@ public class LMStudioClient {
     }
 
     public CompletionResultDTO completion(String model, String uri, String developerMessage, String systemMessage, Double temperature) {
-        RestClient restClient = RestClient.create();
         List<MessageDTO> messages = new ArrayList<>();
 
         messages.add(new MessageDTO("developer", developerMessage));

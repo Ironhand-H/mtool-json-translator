@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 
 public class JSONFileParser {
-    public static JsonNode MToolFileParser(String path) {
+    public static JsonNode mToolFileParser(String path) {
         ObjectMapper objectMapper = new ObjectMapper();
         File file = new File(path); //"D:/ManualTransFile.json"
 

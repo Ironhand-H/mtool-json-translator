@@ -26,4 +26,19 @@ public class FileFactory {
             throw new RuntimeException(e);
         }
     }
+
+
+    public static JsonNode splitFile(JsonNode jsonNode) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File(String.valueOf(jsonNode)); //"D:/ManualTransFile.json"
+
+        try {
+            return objectMapper.readTree(file);
+        }
+        catch(Exception e) {
+            System.out.println("Split file error: " + e.getMessage());
+        }
+
+        return null;
+    }
 }
