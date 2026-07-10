@@ -1,7 +1,7 @@
 package com.ironhand.mtool_json_translator.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -9,10 +9,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.ironhand.mtool_json_translator.service.PromptProvider.getDefaultPrompt;
 import static com.ironhand.mtool_json_translator.service.TextFactory.MToolJSONExtractor;
@@ -20,15 +17,21 @@ import static com.ironhand.mtool_json_translator.service.TranslateBatch.separate
 
 public class FileFactory {
     private final Path inputPath;
-    private Path outputPath;
+    private final Path batchPath;
+    private final ObjectMapper objectMapper;
+    private final Path configPath;
+    private final Path outputPath;
+    private final Integer MAX_LENGTH_BATCH = 2000;
 
     public FileFactory(String path){
         this.inputPath = Paths.get(path);
+        this.objectMapper = new ObjectMapper();
+        this.batchPath = this.inputPath.getParent().resolve("task");
+        this.configPath = this.batchPath.resolve("config.json");
+        this.outputPath = this.inputPath.getParent().resolve("result");
     }
 
     public void generateTranslatedMTool(LinkedHashMap<String, String> translatedText, String originFilePath) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         Iterator<Map.Entry<String, String>> ite = translatedText.entrySet().iterator();
         String fileText = objectMapper.writeValueAsString(translatedText);
 
@@ -44,40 +47,69 @@ public class FileFactory {
 
     public void splitFile() {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             List<LinkedHashMap<String, String>> separatedText = null;
             Integer index = 1;
 
-            this.outputPath = this.inputPath.getParent().resolve("task");
+            if (!Files.exists(batchPath))
+                Files.createDirectory(batchPath);
             if (!Files.exists(outputPath))
                 Files.createDirectory(outputPath);
 
             LinkedHashMap<String, String> originText = MToolJSONExtractor(JSONFileParser.mToolFileParser(inputPath));
 
             if (originText != null) {
-                separatedText = separateText(originText, 5000, getDefaultPrompt().length());
+                separatedText = separateText(originText, MAX_LENGTH_BATCH, getDefaultPrompt().length());
                 for (LinkedHashMap<String, String> oneFile: separatedText){
-                    Path file = outputPath.resolve(index + ".json");
+                    Path file = batchPath.resolve(index + ".json");
 
                     Files.writeString(file, objectMapper.writeValueAsString(oneFile));
                     index++;
                 }
 
-                this.saveProcess(2);
+                this.saveProcess(1);
+                this.saveTotalBatch(separatedText.size());
             }
         }
         catch(Exception e) {
             System.out.println("Split file error: " + e.getMessage());
         }
-
     }
 
-    public void saveProcess(Integer batchProcess) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public List<LinkedHashMap<String, String>> readSplitedFiles(){
+        List<LinkedHashMap<String, String>> output = new ArrayList<LinkedHashMap<String, String>>();
+        Integer index = 1, max = this.readTotalBatch();
+        String content;
+
+        try{
+            for (; index <= max; index++){
+                content = Files.readString(this.batchPath.resolve(index + ".json"));
+                output.add(this.objectMapper.treeToValue(
+                        objectMapper.readTree(content),
+                        new TypeReference<LinkedHashMap<String, String>>() {}));
+            }
+        } catch (RuntimeException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return output;
+    }
+
+    public void saveFileTranslated(LinkedHashMap<String, String> input, Integer index) {
+        try {
+            if (input != null) {
+                Files.writeString(this.outputPath.resolve(index + ".json"), objectMapper.writeValueAsString(input));
+            }
+        }
+        catch(Exception e) {
+            System.out.println("Save file error: " + e.getMessage());
+        }
+    }
+
+    public void saveProcess(Integer process) {
         ObjectNode config = null;
 
         try {
-            Path path = this.outputPath.resolve("config.json");
+            Path path = this.batchPath.resolve("config.json");
 
             if (!Files.exists(path)){
                 Files.createFile(path);
@@ -90,12 +122,78 @@ public class FileFactory {
                 config = (ObjectNode) objectMapper.readTree(content);
             }
 
-            config.put("process", batchProcess);
+            config.put("process", process);
             Files.writeString(path, config.toPrettyString());
         }
         catch(Exception e) {
-            System.out.println("Split file error: " + e.getMessage());
+            System.out.println("Writing config error: " + e.getMessage());
+        }
+    }
+
+    public Integer readProcess() {
+        Integer process = 0;
+
+        try {
+            if (!Files.exists(configPath))
+                throw new FileNotFoundException("Config file of project not found.");
+
+            String content = Files.readString(configPath);
+            if (content.isEmpty()){
+                throw new Exception("Config file damaged.");
+            }else{
+                process = objectMapper.readTree(content).get("process").asInt();
+            }
+        }
+        catch(Exception e) {
+            System.out.println("Reading process error: " + e.getMessage());
         }
 
+        return process;
+    }
+
+    public Integer readTotalBatch() {
+        Integer process = 0;
+
+        try {
+            if (!Files.exists(configPath))
+                throw new FileNotFoundException("Config file of project not found.");
+
+            String content = Files.readString(configPath);
+            if (content.isEmpty()){
+                throw new Exception("Config file damaged.");
+            }else{
+                process = objectMapper.readTree(content).get("total_batch").asInt();
+            }
+        }
+        catch(Exception e) {
+            System.out.println("Reading process error: " + e.getMessage());
+        }
+
+        return process;
+    }
+
+    public void saveTotalBatch(Integer totalBatches) {
+        ObjectNode config = null;
+
+        try {
+            Path path = this.batchPath.resolve("config.json");
+
+            if (!Files.exists(path)){
+                Files.createFile(path);
+            }
+
+            java.lang.String content = Files.readString(path);
+            if (content.isEmpty()){
+                config = objectMapper.createObjectNode();
+            }else{
+                config = (ObjectNode) objectMapper.readTree(content);
+            }
+
+            config.put("total_batch", totalBatches);
+            Files.writeString(path, config.toPrettyString());
+        }
+        catch(Exception e) {
+            System.out.println("Writing config error: " + e.getMessage());
+        }
     }
 }

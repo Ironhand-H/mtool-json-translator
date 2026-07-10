@@ -8,24 +8,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 public class TextFactory {
-    public static LinkedHashMap<String, String> MToolJSONExtractor(JsonNode jsonNode) throws JsonProcessingException {
+    public static LinkedHashMap<String, String> MToolJSONExtractor(JsonNode jsonNode) {
         if (jsonNode == null){
             return null;
         }
 
         ObjectMapper mapper = new ObjectMapper();
-
-        return mapper.treeToValue(jsonNode,
-                new TypeReference<LinkedHashMap<String, String>>() {});
+        try{
+            return mapper.treeToValue(jsonNode,
+                    new TypeReference<LinkedHashMap<String, String>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String mapToPrompt(LinkedHashMap<String, String> map) throws JsonProcessingException {
         nullCheck(map);
 
-        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("从Map到提示词转换（Fast）..."));
+        System.out.printf("%-10s %-10s",
+                LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                ("从Map到提示词转换（Fast）..."));
         List<String> result = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -40,7 +47,9 @@ public class TextFactory {
     public static String mapToPromptSafe(LinkedHashMap<String, String> map) throws JsonProcessingException {
         nullCheck(map);
 
-        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("从Map到提示词转换（Safe）..."));
+        System.out.printf("%-10s %-10s",
+                LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                ("从Map到提示词转换（Safe）..."));
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();
         Integer index = 0;
@@ -59,7 +68,9 @@ public class TextFactory {
     public static List<String> mapToPromptStrict(LinkedHashMap<String, String> map) {
         nullCheck(map);
 
-        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("从Map到提示词转换（Strict）..."));
+        System.out.printf("%-10s %-10s",
+                LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                ("从Map到提示词转换（Strict）..."));
         List<String> strings = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -76,7 +87,9 @@ public class TextFactory {
         ObjectMapper objectMapper = new ObjectMapper();
         int i  = 0;
 
-        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("提取结果..."));
+        System.out.printf("%-10s %-10s",
+                LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                ("提取结果..."));
         List<String> translated = objectMapper.readValue(resultBody, new TypeReference<List<String>>(){});
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
 
@@ -98,7 +111,9 @@ public class TextFactory {
         ObjectMapper objectMapper = new ObjectMapper();
         int i  = 0;
 
-        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("提取结果（Safe）..."));
+        System.out.printf("%-10s %-10s",
+                LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                ("提取结果（Safe）..."));
         JsonNode translated = objectMapper.readTree(resultBody);
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
 
@@ -118,7 +133,9 @@ public class TextFactory {
         ObjectMapper objectMapper = new ObjectMapper();
         int i  = 0;
 
-        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("提取结果（Strict）..."));
+        System.out.printf("%-10s %-10s",
+                LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                ("提取结果（Strict）..."));
         List<JsonNode> translated = new ArrayList<>();
         for (String s: resultBody){
             translated.add(objectMapper.createObjectNode().put("text", s));

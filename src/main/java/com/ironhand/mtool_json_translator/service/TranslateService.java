@@ -6,16 +6,18 @@ import com.ironhand.mtool_json_translator.client.LMStudioClient;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.ironhand.mtool_json_translator.service.PromptProvider.getSimplePromptStrict;
 
 public class TranslateService {
-    RestClient restClient;
+    private final RestClient restClient;
 
     public TranslateService(){
         this.restClient = initialize();
@@ -50,7 +52,7 @@ public class TranslateService {
     public String completion(String model, String uri, String developerMessage, String systemMessage, Double temperature){
         CompletionResultDTO result = null;
 
-        System.out.printf("%-10s %-10s", LocalTime.now().toString(), ("Posting..."));
+        System.out.printf("%-10s %-10s", LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)), ("Posting..."));
         try {
             result = this.post(this.restClient, model, uri, developerMessage, systemMessage, temperature);
         } catch (InterruptedException e) {
@@ -64,7 +66,7 @@ public class TranslateService {
     public List<String> completionStrict(String model, String uri, String developerMessage, List<String> systemMessage, Double temperature){
         List<String> result = new ArrayList<>();
 
-        System.out.printf("%-10s %-10s", LocalTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME), ("Posting(Strict)..."));
+        System.out.printf("%-10s %-10s", LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)), ("Posting(Strict)..."));
         try{
             for (String s: systemMessage){
                 CompletionResultDTO response = this.post(this.restClient, model, uri, developerMessage, s, temperature);
@@ -90,6 +92,9 @@ public class TranslateService {
 
             try {
                 return client.completion(model, uri, developerMessage, systemMessage, temperature);
+            } catch (RestClientException ex) {
+                retry = retry + 3;
+                System.out.print("Decoding error, mad model." + ex.getMessage());
             } catch (RuntimeException e) {
                 System.out.println("Retrying: "
                         + (retry + 1) + "\n" );
