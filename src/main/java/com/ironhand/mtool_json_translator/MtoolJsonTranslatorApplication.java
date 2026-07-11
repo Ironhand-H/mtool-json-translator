@@ -11,11 +11,13 @@ import com.ironhand.mtool_json_translator.service.*;
 public class MtoolJsonTranslatorApplication implements CommandLineRunner {
 
 	public static void main(String[] args)  {
-//        FileFactory factory = new FileFactory("D:\\\\ManualTransFile.json");
+        FileFactory factory = new FileFactory("D:\\\\ManualTransFile.json");
 //        factory.splitFile();
 
-        TranslatePipeline pipeline = new TranslatePipeline();
-        pipeline.MToolTranslate("qwen/qwen3-14b", "http://127.0.0.1:1234/v1/chat/completions", "D:\\ManualTransFile.json");
+//        TranslatePipeline pipeline = new TranslatePipeline();
+//        pipeline.MToolTranslate("qwen/qwen3-14b", "http://127.0.0.1:1234/v1/chat/completions", "D:\\ManualTransFile.json");
+
+        factory.forgeFile();
 
         //SpringApplication.run(MtoolJsonTranslatorApplication.class, args);
 	}

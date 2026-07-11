@@ -20,7 +20,7 @@ public class TranslatePipeline {
         TranslateService service = new TranslateService();
 
 
-        List<LinkedHashMap<String, String>> separatedText = fileFactory.readSplitedFiles();
+        List<LinkedHashMap<String, String>> separatedText = fileFactory.readSplitFiles();
         LinkedHashMap<String, String> translatedText = new LinkedHashMap<>();
 
         for (LinkedHashMap<String, String> batchText : separatedText) {
@@ -59,5 +59,9 @@ public class TranslatePipeline {
             System.out.printf("%-10s %-10s", LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)), ("Batch completed: " + (index+1) + "/" + separatedText.size() + "\n"));
             index++;
         }
+    }
+
+    public void forgeFile(){
+
     }
 }

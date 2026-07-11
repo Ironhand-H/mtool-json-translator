@@ -9,6 +9,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 import static com.ironhand.mtool_json_translator.service.PromptProvider.getDefaultPrompt;
@@ -75,7 +79,29 @@ public class FileFactory {
         }
     }
 
-    public List<LinkedHashMap<String, String>> readSplitedFiles(){
+    public void forgeFile(){
+        Path fileDir = this.batchPath.getParent().resolve(
+                "translated_" +
+                        LocalTime.now().getHour() + "_" +
+                        LocalTime.now().getMinute() + ".json");
+        try{
+            Files.createFile(fileDir);
+            LinkedHashMap<String, String> output = new LinkedHashMap<>();
+
+            List<LinkedHashMap<String, String>> content = this.readSplitFiles(this.outputPath);
+
+            for (LinkedHashMap<String, String> batch: content){
+                output.putAll(batch);
+            }
+
+
+            Files.writeString(fileDir, objectMapper.writeValueAsString(output));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<LinkedHashMap<String, String>> readSplitFiles(){
         List<LinkedHashMap<String, String>> output = new ArrayList<LinkedHashMap<String, String>>();
         Integer index = 1, max = this.readTotalBatch();
         String content;
@@ -83,6 +109,25 @@ public class FileFactory {
         try{
             for (; index <= max; index++){
                 content = Files.readString(this.batchPath.resolve(index + ".json"));
+                output.add(this.objectMapper.treeToValue(
+                        objectMapper.readTree(content),
+                        new TypeReference<LinkedHashMap<String, String>>() {}));
+            }
+        } catch (RuntimeException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return output;
+    }
+
+    public List<LinkedHashMap<String, String>> readSplitFiles(Path path){
+        List<LinkedHashMap<String, String>> output = new ArrayList<LinkedHashMap<String, String>>();
+        Integer index = 1, max = this.readTotalBatch();
+        String content;
+
+        try{
+            for (; index <= max; index++){
+                content = Files.readString(path.resolve(index + ".json"));
                 output.add(this.objectMapper.treeToValue(
                         objectMapper.readTree(content),
                         new TypeReference<LinkedHashMap<String, String>>() {}));
@@ -115,7 +160,7 @@ public class FileFactory {
                 Files.createFile(path);
             }
 
-            java.lang.String content = Files.readString(path);
+            String content = Files.readString(path);
             if (content.isEmpty()){
                 config = objectMapper.createObjectNode();
             }else{
@@ -182,7 +227,7 @@ public class FileFactory {
                 Files.createFile(path);
             }
 
-            java.lang.String content = Files.readString(path);
+            String content = Files.readString(path);
             if (content.isEmpty()){
                 config = objectMapper.createObjectNode();
             }else{
