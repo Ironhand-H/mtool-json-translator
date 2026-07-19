@@ -1,9 +1,6 @@
 package com.ironhand.mtool_json_translator.controller;
 
-import com.ironhand.mtool_json_translator.DTO.frontend.APIResponseDTO;
-import com.ironhand.mtool_json_translator.DTO.frontend.CreateProjectRequestDTO;
-import com.ironhand.mtool_json_translator.DTO.frontend.FileResponseDTO;
-import com.ironhand.mtool_json_translator.DTO.frontend.ProjectResponseDTO;
+import com.ironhand.mtool_json_translator.DTO.frontend.*;
 import com.ironhand.mtool_json_translator.service.FileFactory;
 import com.ironhand.mtool_json_translator.service.TranslatePipeline;
 import org.springframework.web.bind.annotation.*;
@@ -81,12 +78,11 @@ public class FileController {
     }
 
     @PostMapping("/startTask")
-    public APIResponseDTO<ProjectResponseDTO> startTask(@RequestBody String modelName,
-                                                        @RequestBody String url) {
+    public APIResponseDTO<ProjectResponseDTO> startTask(@RequestBody StartTaskRequestDTO request) {
         try{
             TranslatePipeline pipeline = new TranslatePipeline();
             new Thread(() -> {
-                pipeline.MToolTranslate(modelName, url);  //"qwen/qwen3-14b", "http://127.0.0.1:1234/v1/chat/completions"
+                pipeline.MToolTranslate(request.getModelName(), request.getUrl());  //"qwen/qwen3-14b", "http://127.0.0.1:1234/v1/chat/completions"
             });
 
             return new APIResponseDTO<>(
