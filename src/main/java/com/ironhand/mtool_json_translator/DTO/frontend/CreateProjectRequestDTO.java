@@ -5,12 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FileResponseDTO {
+public class CreateProjectRequestDTO {
     private String fileDir;
-    private String fileName;
 
-    public FileResponseDTO(String fileDir, String fileName) {
+    public CreateProjectRequestDTO(String fileDir){
         this.fileDir = fileDir;
-        this.fileName = fileName;
     }
 }

@@ -6,7 +6,6 @@ import {chooseFile} from "./API/API.js";
 function App() {
     const [currentPage, setCurrentPage] = useState("home");
     const [selectedFileDir, setFileDir] = useState("");
-    console.log(selectedFileDir);
 
     switch(currentPage){
         case "translate":

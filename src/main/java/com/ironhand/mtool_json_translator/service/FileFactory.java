@@ -83,9 +83,12 @@ public class FileFactory {
                 Files.createDirectory(batchPath);
             if (!Files.exists(outputPath))
                 Files.createDirectory(outputPath);
+            if (!Files.exists(splitedFilePath))
+                Files.createDirectory(splitedFilePath);
 
-            Files.copy(inputPath, batchPath);
-            LinkedHashMap<String, String> originText = MToolJSONExtractor(JSONFileParser.mToolFileParser(inputPath));
+            Files.copy(inputPath, batchPath.resolve("originfile.json"));
+            LinkedHashMap<String, String> originText = MToolJSONExtractor(
+                    JSONFileParser.mToolFileParser(batchPath.resolve("originfile.json")));
 
             if (originText != null) {
                 separatedText = separateText(originText, MAX_LENGTH_BATCH, getDefaultPrompt().length());

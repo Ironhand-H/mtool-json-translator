@@ -1,6 +1,7 @@
 package com.ironhand.mtool_json_translator.controller;
 
 import com.ironhand.mtool_json_translator.DTO.frontend.APIResponseDTO;
+import com.ironhand.mtool_json_translator.DTO.frontend.CreateProjectRequestDTO;
 import com.ironhand.mtool_json_translator.DTO.frontend.FileResponseDTO;
 import com.ironhand.mtool_json_translator.DTO.frontend.ProjectResponseDTO;
 import com.ironhand.mtool_json_translator.service.FileFactory;
@@ -23,12 +24,11 @@ public class FileController {
 
         int returnVal = chooser.showOpenDialog(null);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-            System.out.println("You chose to open this file: " +
-                    chooser.getSelectedFile().getName());
             return new APIResponseDTO<>(
                     true,
                     "Choose file success.",
                     new FileResponseDTO(
+                            chooser.getSelectedFile().getAbsolutePath(),
                             chooser.getSelectedFile().getName()
                     ));
         }else{
@@ -40,9 +40,9 @@ public class FileController {
     }
 
     @PostMapping("/createProject")
-    public APIResponseDTO<ProjectResponseDTO> createProject(@RequestBody String fileDir) {
+    public APIResponseDTO<ProjectResponseDTO> createProject(@RequestBody CreateProjectRequestDTO request) {
         try{
-            FileFactory factory = new FileFactory(fileDir);
+            FileFactory factory = new FileFactory(request.getFileDir());
             factory.splitFile();
 
             return new APIResponseDTO<>(

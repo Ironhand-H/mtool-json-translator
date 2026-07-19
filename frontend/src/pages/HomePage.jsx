@@ -7,9 +7,10 @@ function HomePage({changePage, selectedFileDir, handleChooseFile}) {
         const response = await projectExist();
 
         if (response.data !== null){
+            console.log(response);
             changePage("translate");
         }else{
-            alert("No project created now.");
+            alert("No project found")
         }
     }
 
