@@ -3,6 +3,7 @@ import {useState} from "react";
 
 function HomePage({changePage}) {
     const [fileDir, setFileDir] = useState("");
+    const hasSelectedFile = (fileDir !== "");
 
     async function handleChooseFile() {
 
@@ -20,13 +21,22 @@ function HomePage({changePage}) {
             <h1>AI-Translation-Toolkit</h1>
             <p>Welcome!</p>
 
-            <button onClick={() => changePage("translate")}>
-                Press to translate!
-            </button>
             <button onClick={handleChooseFile}>
                 Press to select file!
             </button>
-            <p>{fileDir}</p>
+
+
+            { hasSelectedFile && (
+                <>
+                    <p>Selected file: {fileDir}</p>
+
+                    <button onClick={() => changePage("translate")}>
+                        File ready? Press to translate!
+                    </button>
+                </>
+            )}
+
+
         </>
     )
 }
