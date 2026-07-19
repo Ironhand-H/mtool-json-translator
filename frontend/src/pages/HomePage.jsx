@@ -10,7 +10,9 @@ function HomePage({changePage}) {
 
         //console.log(result);
 
-        setFileDir(result.data.fileDir);
+        if(result.success){
+            setFileDir(result.data.fileDir);
+        }
     }
 
     return (
