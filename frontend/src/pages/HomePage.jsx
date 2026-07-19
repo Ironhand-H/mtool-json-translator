@@ -1,20 +1,5 @@
-import {chooseFile} from "../API/API.js";
-import {useState} from "react";
-
-function HomePage({changePage}) {
-    const [fileDir, setFileDir] = useState("");
-    const hasSelectedFile = (fileDir !== "");
-
-    async function handleChooseFile() {
-
-        const result = await chooseFile();
-
-        //console.log(result);
-
-        if(result.success){
-            setFileDir(result.data.fileDir);
-        }
-    }
+function HomePage({changePage, selectedFileDir, handleChooseFile}) {
+    const hasSelectedFile = (selectedFileDir !== "");
 
     return (
         <>
@@ -28,14 +13,13 @@ function HomePage({changePage}) {
 
             { hasSelectedFile && (
                 <>
-                    <p>Selected file: {fileDir}</p>
+                    <p>Selected file: {selectedFileDir}</p>
 
                     <button onClick={() => changePage("translate")}>
                         File ready? Press to translate!
                     </button>
                 </>
             )}
-
 
         </>
     )

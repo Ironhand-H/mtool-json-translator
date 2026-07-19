@@ -1,6 +1,11 @@
 function Translate() {
+
+
     return (
-        <h1>Translate Page</h1>
+        <>
+            <h1>Translate Page</h1>
+            <p>Selected File: {selectedFileDir}</p>
+        </>
     )
 }
 
