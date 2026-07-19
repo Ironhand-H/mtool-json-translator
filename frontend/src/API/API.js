@@ -28,3 +28,19 @@ export async function createProject(fileDir) {
 
     return await response.json();
 }
+
+export async function startTask(modelName, url) {
+
+    const response = await fetch("/api/startTask", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            "modelName": modelName,
+            "url": url
+        })
+    });
+
+    return await response.json();
+}

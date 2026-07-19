@@ -83,7 +83,7 @@ public class FileController {
             TranslatePipeline pipeline = new TranslatePipeline();
             new Thread(() -> {
                 pipeline.MToolTranslate(request.getModelName(), request.getUrl());  //"qwen/qwen3-14b", "http://127.0.0.1:1234/v1/chat/completions"
-            });
+            }).start();
 
             return new APIResponseDTO<>(
                     true,

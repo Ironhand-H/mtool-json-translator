@@ -137,7 +137,7 @@ public class FileFactory {
 
         try{
             for (; index <= max; index++){
-                content = Files.readString(this.batchPath.resolve(index + ".json"));
+                content = Files.readString(this.splitedFilePath.resolve(index + ".json"));
                 output.add(this.objectMapper.treeToValue(
                         objectMapper.readTree(content),
                         new TypeReference<LinkedHashMap<String, String>>() {}));
