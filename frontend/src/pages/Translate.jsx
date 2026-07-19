@@ -50,38 +50,40 @@ function Translate({selectedFileDir}) {
 
 
     return (
-        <>
-            <h1>Translate Page</h1>
+        <div className="container">
+            <div className="translateCard">
+                <h1>Translate Page</h1>
 
-            <input name={"modelName"} defaultValue={modelName}
-                   onChange={(e) => setModelName(e.target.value)}
-            />
-            <input name={"url"} defaultValue={url}
-                   onChange={(e) => setUrl(e.target.value)}
-            />
-            {hasProjectCreated && (
-                <>
-                    <p>Current project status: {taskIsRunning && (" translating")}</p>
-                    <p>Progress: {projectInfo.currentBatch}</p>
-                    <p>Total: {projectInfo.totalBatch}</p>
+                <input name={"modelName"} defaultValue={modelName}
+                       onChange={(e) => setModelName(e.target.value)}
+                />
+                <input name={"url"} defaultValue={url}
+                       onChange={(e) => setUrl(e.target.value)}
+                />
+                {hasProjectCreated && (
+                    <>
+                        <p>Current project status: {taskIsRunning && (" translating")}</p>
+                        <p>Progress: {projectInfo.currentBatch}</p>
+                        <p>Total: {projectInfo.totalBatch}</p>
 
-                    <button disabled={taskIsRunning} onClick={() => {
-                        console.log("clicked");
-                        handleStartTask();
-                    }}>
-                        Start translation
-                    </button>
-                </>
-            )}
-            {!hasProjectCreated && (
-                <>
-                    <p>You need to create a project before start! Create now?</p>
-                    <button onClick={handleCreateProject}>
-                        Create project
-                    </button>
-                </>
-            )}
-        </>
+                        <button disabled={taskIsRunning} onClick={() => {
+                            console.log("clicked");
+                            handleStartTask();
+                        }}>
+                            Start translation
+                        </button>
+                    </>
+                )}
+                {!hasProjectCreated && (
+                    <>
+                        <p>You need to create a project before start! Create now?</p>
+                        <button onClick={handleCreateProject}>
+                            Create project
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>
     )
 }
 
