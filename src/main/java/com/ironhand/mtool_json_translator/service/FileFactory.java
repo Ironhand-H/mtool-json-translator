@@ -56,6 +56,9 @@ public class FileFactory {
         this.outputPath = this.batchPath.resolve("result");
     }
 
+    public boolean projectCreated(){
+         return Files.exists(this.configPath);
+    }
 
     public void generateTranslatedMTool(LinkedHashMap<String, String> translatedText, String originFilePath) throws JsonProcessingException {
         Iterator<Map.Entry<String, String>> ite = translatedText.entrySet().iterator();

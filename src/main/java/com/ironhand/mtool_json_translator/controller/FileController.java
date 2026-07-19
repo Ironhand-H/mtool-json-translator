@@ -101,22 +101,29 @@ public class FileController {
         }
     }
 
-    @PostMapping("/asyncProjectStatus")
-    public APIResponseDTO<ProjectResponseDTO> asyncProjectStatus() {
+    @PostMapping("/projectExist")
+    public APIResponseDTO<ProjectResponseDTO> projectExist() {
         try{
             FileFactory factory = new FileFactory();
+            if (factory.projectCreated()){
+                return new APIResponseDTO<>(
+                        true,
+                        "A project is Created.",
+                        new ProjectResponseDTO(
+                                factory.getConfigPath().toString(),
+                                factory.readTotalBatch(),
+                                factory.readCurrentBatch()));
+            }else {
+                return new APIResponseDTO<>(
+                        true,
+                        "No created project found.",
+                        null);
+            }
 
-            return new APIResponseDTO<>(
-                    true,
-                    "Async status.",
-                    new ProjectResponseDTO(
-                            factory.getConfigPath().toString(),
-                            factory.readTotalBatch(),
-                            factory.readCurrentBatch()));
         } catch (Exception e) {
             return new APIResponseDTO<>(
                     false,
-                    "Async status failed: " + e.getMessage(),
+                    "Read project status failed: " + e.getMessage(),
                     null);
         }
     }

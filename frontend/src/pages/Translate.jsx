@@ -1,4 +1,4 @@
-function Translate() {
+function Translate({selectedFileDir}) {
 
 
     return (

@@ -6,3 +6,12 @@ export async function chooseFile() {
 
     return await response.json();
 }
+
+export async function projectExist() {
+
+    const response = await fetch("/api/projectExist", {
+        method: "POST"
+    });
+
+    return await response.json();
+}

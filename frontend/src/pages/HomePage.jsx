@@ -1,5 +1,17 @@
+import {projectExist} from "../API/API.js";
+
 function HomePage({changePage, selectedFileDir, handleChooseFile}) {
     const hasSelectedFile = (selectedFileDir !== "");
+
+     async function handleContinue(){
+        const response = await projectExist();
+
+        if (response.data !== null){
+            changePage("translate");
+        }else{
+            alert("No project created now.");
+        }
+    }
 
     return (
         <>
@@ -10,6 +22,9 @@ function HomePage({changePage, selectedFileDir, handleChooseFile}) {
                 Press to select file!
             </button>
 
+            <button onClick={handleContinue}>
+                A translate project is already in progress? Click here to continue
+            </button>
 
             { hasSelectedFile && (
                 <>

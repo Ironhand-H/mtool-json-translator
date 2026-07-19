@@ -6,10 +6,14 @@ import {chooseFile} from "./API/API.js";
 function App() {
     const [currentPage, setCurrentPage] = useState("home");
     const [selectedFileDir, setFileDir] = useState("");
+    console.log(selectedFileDir);
 
     switch(currentPage){
         case "translate":
-            return <Translate changePage = {changePage}/>
+            return <Translate
+                changePage = {changePage}
+                selectedFileDir = {selectedFileDir}
+            />
         case "home":
             return <HomePage
                 changePage = {changePage}
@@ -33,10 +37,8 @@ function App() {
     async function handleChooseFile() {
         const result = await chooseFile();
 
-        //console.log(result);
-
         if(result.success){
-            setFileDir(result.data.selectedFileDir);
+            setFileDir(result.data.fileDir);
         }
     }
 }
