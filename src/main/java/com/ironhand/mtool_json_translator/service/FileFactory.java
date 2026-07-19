@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Getter;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.*;
 
@@ -19,21 +19,43 @@ import static com.ironhand.mtool_json_translator.service.PromptProvider.getDefau
 import static com.ironhand.mtool_json_translator.service.TextFactory.MToolJSONExtractor;
 import static com.ironhand.mtool_json_translator.service.TranslateBatch.separateText;
 
+@Getter
 public class FileFactory {
     private final Path inputPath;
     private final Path batchPath;
     private final ObjectMapper objectMapper;
+    private final Path splitedFilePath;
     private final Path configPath;
     private final Path outputPath;
+
     private final Integer MAX_LENGTH_BATCH = 2000;
 
     public FileFactory(String path){
         this.inputPath = Paths.get(path);
         this.objectMapper = new ObjectMapper();
-        this.batchPath = this.inputPath.getParent().resolve("task");
+
+        this.batchPath = Paths.get(
+                System.getProperty("user.home"),
+                "Documents",
+                "AI Localization Toolkit");
+        this.splitedFilePath = this.batchPath.resolve("tasks");
         this.configPath = this.batchPath.resolve("config.json");
-        this.outputPath = this.inputPath.getParent().resolve("result");
+        this.outputPath = this.batchPath.resolve("result");
     }
+
+    public FileFactory(){
+        this.inputPath = null;
+        this.objectMapper = new ObjectMapper();
+
+        this.batchPath = Paths.get(
+                System.getProperty("user.home"),
+                "Documents",
+                "AI Localization Toolkit");
+        this.splitedFilePath = this.batchPath.resolve("tasks");
+        this.configPath = this.batchPath.resolve("config.json");
+        this.outputPath = this.batchPath.resolve("result");
+    }
+
 
     public void generateTranslatedMTool(LinkedHashMap<String, String> translatedText, String originFilePath) throws JsonProcessingException {
         Iterator<Map.Entry<String, String>> ite = translatedText.entrySet().iterator();
@@ -59,19 +81,20 @@ public class FileFactory {
             if (!Files.exists(outputPath))
                 Files.createDirectory(outputPath);
 
+            Files.copy(inputPath, batchPath);
             LinkedHashMap<String, String> originText = MToolJSONExtractor(JSONFileParser.mToolFileParser(inputPath));
 
             if (originText != null) {
                 separatedText = separateText(originText, MAX_LENGTH_BATCH, getDefaultPrompt().length());
                 for (LinkedHashMap<String, String> oneFile: separatedText){
-                    Path file = batchPath.resolve(index + ".json");
+                    Path file = splitedFilePath.resolve(index + ".json");
 
                     Files.writeString(file, objectMapper.writeValueAsString(oneFile));
                     index++;
                 }
 
+                this.initializeConfig(separatedText.size());
                 this.saveProcess(1);
-                this.saveTotalBatch(separatedText.size());
             }
         }
         catch(Exception e) {
@@ -175,7 +198,7 @@ public class FileFactory {
         }
     }
 
-    public Integer readProcess() {
+    public Integer readCurrentBatch() {
         Integer process = 0;
 
         try {
@@ -217,7 +240,7 @@ public class FileFactory {
         return process;
     }
 
-    public void saveTotalBatch(Integer totalBatches) {
+    public void initializeConfig(Integer countBatches) {
         ObjectNode config = null;
 
         try {
@@ -234,7 +257,8 @@ public class FileFactory {
                 config = (ObjectNode) objectMapper.readTree(content);
             }
 
-            config.put("total_batch", totalBatches);
+            config.put("total_batch", countBatches);
+            config.put("create_time", LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)));
             Files.writeString(path, config.toPrettyString());
         }
         catch(Exception e) {

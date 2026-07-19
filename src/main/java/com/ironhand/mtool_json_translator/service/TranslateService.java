@@ -69,7 +69,7 @@ public class TranslateService {
         System.out.printf("%-10s %-10s", LocalTime.now().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)), ("Posting(Strict)..."));
         try{
             for (String s: systemMessage){
-                CompletionResultDTO response = this.post(this.restClient, model, uri, developerMessage, s, temperature);
+                CompletionResultDTO response = this.postWithRetry(this.restClient, model, uri, developerMessage, s, temperature);
                 result.add(response.getChoices().getFirst().getMessage().getContent().strip());
             }
         } catch (InterruptedException e) {
@@ -81,6 +81,25 @@ public class TranslateService {
     }
 
     private CompletionResultDTO post(
+            RestClient restClient,
+            String model, String uri,
+            String developerMessage, String systemMessage,
+            Double temperature) throws InterruptedException {
+
+        LMStudioClient client = new LMStudioClient(restClient);
+
+        try {
+            return client.completion(model, uri, developerMessage, systemMessage, temperature);
+        } catch (RestClientException ex) {
+            System.out.print("Decoding error, mad model." + ex.getMessage());
+        } catch (RuntimeException e) {
+            System.out.println("Passing to next\n" );
+        }
+
+        throw new RuntimeException("LM Studio unavailable.");
+    }
+
+    private CompletionResultDTO postWithRetry(
             RestClient restClient,
             String model, String uri,
             String developerMessage, String systemMessage,
