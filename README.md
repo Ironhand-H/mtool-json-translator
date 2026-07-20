@@ -197,13 +197,13 @@ Implemented
 - Automatic fallback
 - Batch translation
 - JSON reconstruction
+- Checkpoint / resume
 - Desktop GUI
 
 Currently Improving
 
 - Translation quality
 - Long task stability
-- Checkpoint / resume
 - Performance optimization
 - Forge file after the translation
 - Error alert
