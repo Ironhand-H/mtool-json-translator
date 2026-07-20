@@ -5,96 +5,120 @@
 
 # AI Localization Toolkit
 
-一个基于 **Java + Spring Boot** 开发的游戏 AI 本地化工具。
+一款基于 Java 开发、由本地大语言模型驱动的游戏本地化工具。
 
-本项目通过 **LM Studio 提供的 OpenAI Compatible API** 调用本地大语言模型，对游戏资源文件进行自动翻译，目标是构建一个稳定、可扩展的离线 AI 本地化工具。
+本项目通过 LM Studio 或在线模型提供的 OpenAI Compatible API 对游戏资源文件进行翻译，专注于离线 AI 辅助本地化，并强调自动化处理流程。
 
-> **当前状态：MVP（最小可用版本）**
-
----
-
-# 功能
-
-## ✔ AI 翻译流程
-
-- 支持本地大语言模型翻译
-- 基于 LM Studio OpenAI Compatible API
-- 可配置 Temperature
-- 多种翻译策略
+> **当前状态：** 已提供可下载的 Release 版本。即使目标电脑未安装 JDK，也可以直接运行本软件。
 
 ---
 
-## ✔ 三种翻译模式
+## 功能
 
-### Fast
+### ✔ 翻译模式
 
-- 批量翻译
-- 速度最快
-- 适合绝大多数文本
+本工具提供 **3 种翻译模式**，分别对应发送给 AI API 的不同 JSON 格式，目的是尽可能节省 Token，并提高翻译稳定性。
 
-### Safe
+翻译流程会自动根据失败情况切换策略。
 
-- JSON 结构保护
-- 保证返回合法 JSON
-- 提高稳定性
+首先会使用 **Fast** 模式进行批量翻译；如果失败，则自动切换到 **Safe** 模式；如果仍然失败，则进入最后的 **Strict** 模式。
 
-### Strict
+Strict 模式会逐句发送翻译请求，并在模型输出异常时最多自动重试 3 次。
 
-- 单句翻译
-- 最终兜底方案
-- 优先保证翻译成功
+```
+Fast -> Safe -> Strict
+```
 
----
+- **Fast**
+  - 批量翻译
+  - 最高翻译速度
 
-## ✔ JSON 处理
+```
+Fast 模式示例：
+        ["こんにちは","EV001","flower.png","100"]
+```
 
-目前支持：
+- **Safe**
+  - 基于 JSON 结构进行翻译
+  - 保留对象结构
 
-- 读取 MTool JSON
-- 提取待翻译文本
+```
+Safe 模式示例：
+        [
+          {
+            "id":0,
+            "text":"こんにちは"
+          },
+          {
+            "id":1,
+            "text":"EV001"
+          }
+        ]
+```
+
+- **Strict**
+  - 逐句翻译作为最终回退方案
+  - 提供最高的翻译可靠性
+
+```
+Strict 模式示例：
+        "こんにちは"
+```
+
+### 使用方法
+
+#### 运行要求
+
+你只需要准备：
+
+- 一个需要翻译的 JSON 文件
+- 一个可用的 OpenAI Compatible API
+
+#### 使用步骤
+
+- 首先选择需要翻译的文件，然后点击 **Create Project**。
+
+  程序会在 **文档 (Documents)** 目录下创建一个名为 **AI Localization Toolkit** 的项目目录。
+
+  原始 JSON 文件会被拆分，并保存到 **AI Localization Toolkit/tasks** 目录中。
+
+  <img width="957" height="467" alt="image" src="https://github.com/user-attachments/assets/a0ba69fc-a923-4ce9-8223-54a714799f9a" />
+
+- 点击 **Translate** 即可开始翻译。
+
+  <img width="876" height="432" alt="image" src="https://github.com/user-attachments/assets/36274cc5-b5af-4788-8661-7732bf68fc07" />
+
+- 如果之前已有未完成的项目，可在首页点击 **Continue**，随后点击 **Translate** 继续之前的任务。
+
+### ✔ JSON 处理
+
+- 读取 JSON 文件
+- 提取可翻译文本
 - 保留原始 JSON 结构
-- 自动生成翻译后的 JSON 文件
+- 自动生成翻译后的 JSON
+
+### ✔ 错误处理
+
+- HTTP 超时检测（5 分钟）
+- 自动重试（最多 3 次）
+- 自动切换翻译模式
+- JSON 校验
 
 ---
 
-## ✔ 自动降级机制
-
-```
-Fast
-   ↓
-Safe
-   ↓
-Strict
-```
-
-当翻译失败时，程序会自动切换到更安全的翻译策略。
-
----
-
-## ✔ 异常处理
-
-目前已实现：
-
-- HTTP Timeout 检测
-- 自动重试（Retry）
-- 翻译模式自动切换
-- JSON 格式校验
-
----
-
-# 项目架构
+## 当前架构
 
 ```
 JSON 文件
       │
       ▼
- JSON Parser
+ JSON 解析器
       │
       ▼
- Translation Pipeline
+ 翻译流水线
       │
       ▼
- Translation Service
+ 翻译服务
       │
       ▼
  LM Studio Client
@@ -103,7 +127,7 @@ JSON 文件
  本地大语言模型
       │
       ▼
- Result Parser
+ 结果解析器
       │
       ▼
  翻译后的 JSON
@@ -111,29 +135,44 @@ JSON 文件
 
 ---
 
-# 技术栈
-
-后端
+## 使用技术
 
 - Java
 - Spring Boot
 - RestClient
 - Jackson
 - Maven
+- Electron
+- React
 
-AI
+用于测试的本地 AI
 
 - LM Studio
-- OpenAI Compatible API
-- Qwen3
+- OpenAI Compatible API（chat/completions）
+- 模型：qwen/qwen3-14b
 
----
+开发工具
 
-# 当前支持
+- IntelliJ IDEA
+- Postman
+- VS Code
 
-✔ MTool JSON
+## 当前支持格式
 
-计划支持：
+- ✔ MTool 生成的 JSON 文件
+
+```
+支持的 JSON 示例：
+
+{
+    "砂漠迷宮へ": "砂漠迷宮へ",
+    "巨大樹の森へ": "巨大樹の森へ",
+    "マディラ氷雪山へ": "マディラ氷雪山へ",
+    "アゲート鉱山へ": "アゲート鉱山へ"
+}
+```
+
+未来计划支持
 
 - Unity
 - RPG Maker
@@ -141,14 +180,14 @@ AI
 
 ---
 
-# 工作流程
+## 工作流程示例
 
 ```
 输入 JSON
 
 ↓
 
-提取文本
+提取文本并拆分为多个文件
 
 ↓
 
@@ -160,71 +199,39 @@ AI
 
 ↓
 
-失败自动降级
+必要时自动回退
 
 ↓
 
-重建 JSON
-
-↓
-
-生成翻译文件
+生成翻译后的 JSON（GUI 暂未支持）
 ```
 
 ---
 
-# 当前完成进度
+## 项目状态
 
-## 已完成
+### 已实现
 
-- JSON 文件解析
-- AI 翻译流程
+- JSON 解析器
+- AI 翻译流水线
 - DTO 映射
-- Prompt 管理
 - Fast / Safe / Strict 三种翻译模式
-- 自动重试
-- 自动降级
+- 自动重试与回退
 - 批量翻译
-- JSON 重建
+- JSON 重构
+- 断点续传 / 继续翻译
+- 桌面 GUI
 
----
-
-## 正在优化
+### 正在改进
 
 - 翻译质量
 - 长时间任务稳定性
-- 断点续翻
 - 性能优化
+- 翻译完成后自动生成最终 JSON 文件
+- 错误提示
+- Prompt 管理
 
----
+### 计划中
 
-## 后续计划
-
-- 图形界面（GUI）
 - 配置文件
-- 更多游戏格式支持
-- 术语词典
-- 更多本地模型适配
-
----
-
-# 运行环境
-
-- Java 21+
-- LM Studio
-- 开启 OpenAI Compatible API
-
----
-
-# 项目目标
-
-本项目不仅仅是一个 JSON 翻译脚本，而是希望构建一个能够用于游戏本地化工作的 AI 工具。
-
-开发重点包括：
-
-- 稳定可靠的翻译流程
-- 可扩展的文件解析架构
-- 自动容错与降级机制
-- 支持多种游戏资源格式
-- 后续提供桌面 GUI，提升实际使用体验
-
+- 支持更多游戏格式
