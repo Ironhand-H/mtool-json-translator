@@ -62,7 +62,7 @@ Strict mode example:
 
 All you need is a JSON file that need to be translated and an enabled OpenAI Compatible API
 
-#### Fast use
+#### How to use
 
  - First choose the file that need to be translated. Then click to create a project. A new directory "AI Localization Toolkit" will be created in the "Documents" as the project. The file will be splited and saved in "tasks" under "AI Localization Toolkit".
    <img width="957" height="467" alt="image" src="https://github.com/user-attachments/assets/a0ba69fc-a923-4ce9-8223-54a714799f9a" />
@@ -125,12 +125,13 @@ JSON File
 - Jackson
 - Maven
 - Electron
+- React
 
 Local AI used for testing
 
 - LM Studio
-- OpenAI Compatible API
-- Qwen3
+- OpenAI Compatible API (chat/completions)
+- Model: qwen/qwen3-14b
 
 IDE and other tools used
 
@@ -179,7 +180,7 @@ Fallback if needed
 
 ↓
 
-Generate translated JSON
+Generate translated JSON (Currently not available in GUI)
 ```
 
 ---
@@ -191,10 +192,8 @@ Implemented
 - JSON parser
 - AI translation pipeline
 - DTO mapping
-- Prompt management
 - Fast / Safe / Strict modes
-- Automatic retry
-- Automatic fallback
+- Automatic retry and fallback
 - Batch translation
 - JSON reconstruction
 - Checkpoint / resume
@@ -205,8 +204,9 @@ Currently Improving
 - Translation quality
 - Long task stability
 - Performance optimization
-- Forge file after the translation
+- Forge file after the translation, generate translated JSON
 - Error alert
+- Prompt management
 
 Planned
 
