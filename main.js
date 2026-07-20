@@ -6,6 +6,21 @@ let backendProcess;
 let mainWindow;
 
 /**
+ * 根据运行环境确定 Java 和 Jar 的位置
+ */
+const javaExecutable = app.isPackaged
+    ? path.join(process.resourcesPath, "runtime", "bin", "java.exe")
+    : "java";
+
+const jarFile = app.isPackaged
+    ? path.join(process.resourcesPath, "backend", "app.jar")
+    : path.join(
+        __dirname,
+        "target",
+        "mtool-json-translator-0.0.1-SNAPSHOT.jar"
+    );
+
+/**
  * 等待指定时间
  */
 function sleep(ms) {
@@ -17,18 +32,19 @@ function sleep(ms) {
  */
 function startBackend() {
 
+    console.log("Java:", javaExecutable);
+    console.log("Jar :", jarFile);
+
     backendProcess = spawn(
-        "java",
+        javaExecutable,
         [
             "-jar",
-            path.join(
-                __dirname,
-                "target",
-                "mtool-json-translator-0.0.1-SNAPSHOT.jar"
-            )
+            jarFile
         ],
         {
-            cwd: __dirname
+            cwd: app.isPackaged
+                ? process.resourcesPath
+                : __dirname
         }
     );
 
@@ -42,6 +58,10 @@ function startBackend() {
 
     backendProcess.on("close", code => {
         console.log(`Spring Boot exited. Code: ${code}`);
+    });
+
+    backendProcess.on("error", err => {
+        console.error("[Spawn Error]", err);
     });
 }
 
@@ -115,9 +135,7 @@ app.on("window-all-closed", () => {
     console.log("Closing application...");
 
     if (backendProcess) {
-
         backendProcess.kill();
-
     }
 
     app.quit();
@@ -130,9 +148,7 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
 
     if (BrowserWindow.getAllWindows().length === 0) {
-
         createWindow();
-
     }
 
 });

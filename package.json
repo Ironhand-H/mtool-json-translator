@@ -22,7 +22,6 @@
     "files": [
       "main.js",
       "package.json",
-      "target/**/*",
       "node_modules/**/*"
     ],
     "win": {
@@ -34,6 +33,17 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
-    }
+    },
+      "extraResources": [
+      {
+          "from": "runtime",
+          "to": "runtime"
+      },
+      {
+          "from": "target/mtool-json-translator-0.0.1-SNAPSHOT.jar",
+          "to": "backend/app.jar"
+      }
+    ]
   }
+
 }
