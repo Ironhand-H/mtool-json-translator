@@ -1,0 +1,39 @@
+{
+  "name": "mtool-json-translator",
+  "version": "0.1.0",
+  "description": "AI Localization Toolkit",
+  "main": "main.js",
+  "author": "Ziyang HUANG",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.ironhand.ailocalizationtoolkit",
+    "productName": "AI Localization Toolkit",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "target/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
