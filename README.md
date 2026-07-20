@@ -124,6 +124,7 @@ JSON File
 - RestClient
 - Jackson
 - Maven
+- Electron
 
 Local AI used for testing
 
@@ -135,7 +136,7 @@ IDE and other tools used
 
 - Intellij
 - Postman
-
+- VS Code
 
 ## Current Supported Format
 
