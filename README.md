@@ -1,9 +1,7 @@
-# MTool JSON Translator
+# AI Localization Toolkit
 
 🌍 Language:
 **English** | [简体中文](README_zh.md) | [Français](README_fr.md)
-
-# AI Localization Toolkit
 
 A Java-based game localization tool powered by local Large Language Models.
 
